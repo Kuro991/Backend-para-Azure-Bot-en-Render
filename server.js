@@ -3,7 +3,7 @@ const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // ✅ Tu clave secreta Direct Line (Render la almacenará como variable de entorno)
 const DIRECT_LINE_SECRET = process.env.DIRECT_LINE_SECRET;
@@ -45,3 +45,4 @@ app.get('/api/token', async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`✅ Servidor corriendo en puerto ${PORT}`));
+
