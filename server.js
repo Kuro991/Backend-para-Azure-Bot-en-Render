@@ -3,16 +3,19 @@ const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
+
+// Render asigna el puerto dinámicamente
 const PORT = process.env.PORT || 10000;
 
-// ✅ Tu clave secreta Direct Line (Render la almacenará como variable de entorno)
+// Tu clave secreta Direct Line (configurada en Render como variable de entorno)
 const DIRECT_LINE_SECRET = process.env.DIRECT_LINE_SECRET;
 
-// ✅ Dominios permitidos (tu sitio del blob)
+// Dominios permitidos para CORS (tu sitio web)
 const ALLOWED_ORIGINS = [
   'https://dpchatbottest.z5.web.core.windows.net'
 ];
 
+// Middleware CORS
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || ALLOWED_ORIGINS.includes(origin)) {
@@ -25,15 +28,25 @@ app.use(cors({
 
 app.use(express.json());
 
-// Endpoint para generar el token
+// Ruta de bienvenida
+app.get('/', (req, res) => {
+  res.send(`
+    <h1>Backend del Bot desplegado en Render ✅</h1>
+    <p>Usa el endpoint <code>/api/token</code> para generar tokens de Direct Line.</p>
+  `);
+});
+
+// Endpoint para generar token Direct Line
 app.get('/api/token', async (req, res) => {
+  if (!DIRECT_LINE_SECRET) {
+    return res.status(500).json({ error: 'Falta la variable de entorno DIRECT_LINE_SECRET' });
+  }
+
   try {
     const response = await axios.post(
       'https://directline.botframework.com/v3/directline/tokens/generate',
       {},
-      {
-        headers: { 'Authorization': `Bearer ${DIRECT_LINE_SECRET}` }
-      }
+      { headers: { 'Authorization': `Bearer ${DIRECT_LINE_SECRET}` } }
     );
 
     console.log('🔑 Token generado correctamente');
@@ -44,5 +57,7 @@ app.get('/api/token', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`✅ Servidor corriendo en puerto ${PORT}`));
-
+// Arrancar servidor
+app.listen(PORT, () => {
+  console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+});
